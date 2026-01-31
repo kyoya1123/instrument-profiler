@@ -172,7 +172,3 @@ IssueやPull Requestは日本語・英語どちらでも歓迎です！
 
 MIT License - [LICENSE](LICENSE)を参照
 
-## 関連スキル
-
-- `swiftui-performance-audit` — コードレビューベースのパフォーマンス分析
-- `ios-debugger-agent` — XcodeBuildMCPを使ったランタイムデバッグ

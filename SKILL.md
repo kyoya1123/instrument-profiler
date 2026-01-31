@@ -369,8 +369,6 @@ git clone https://github.com/brendangregg/FlameGraph
 | Heavy work in body | 事前計算・キャッシュ |
 | Large images | ダウンサンプリング |
 
-詳細は `swiftui-performance-audit` スキルを参照。
-
 ## Output Format
 
 ### SwiftUIテンプレート使用時

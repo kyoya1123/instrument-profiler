@@ -172,7 +172,3 @@ Issues and pull requests welcome! Please file issues in both English or Japanese
 
 MIT License - see [LICENSE](LICENSE)
 
-## Related Skills
-
-- `swiftui-performance-audit` — Code review-based performance analysis
-- `ios-debugger-agent` — Runtime debugging with XcodeBuildMCP
