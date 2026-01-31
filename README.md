@@ -68,6 +68,11 @@ Run Instruments profiling
 |------|----------|----------|
 | **SwiftUI** | SwiftUI + Time Profiler + Hangs + Hitches | View updates, CPU usage, UI responsiveness |
 | **App Launch** | App Launch | Startup time, library loading, initialization |
+| **Time Profiler** | Time Profiler | General CPU profiling |
+| **Leaks** | Leaks | Memory leak detection |
+| **Allocations** | Allocations | Memory allocation analysis |
+| **Animation Hitches** | Animation Hitches | Frame drop detection, scroll performance |
+| **Energy Log** | Energy Log | Battery consumption analysis (physical device only) |
 
 ### Example Output
 

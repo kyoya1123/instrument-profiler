@@ -68,6 +68,11 @@ Instrumentsでプロファイリングして
 |--------|-------------|------|
 | **SwiftUI** | SwiftUI + Time Profiler + Hangs + Hitches | View更新、CPU使用率、UIレスポンス |
 | **App Launch** | App Launch | 起動時間、ライブラリロード、初期化 |
+| **Time Profiler** | Time Profiler | 汎用CPUプロファイリング |
+| **Leaks** | Leaks | メモリリーク検出 |
+| **Allocations** | Allocations | メモリ割り当て分析 |
+| **Animation Hitches** | Animation Hitches | フレームドロップ検出、スクロール性能 |
+| **Energy Log** | Energy Log | バッテリー消費分析（実機のみ） |
 
 ### 出力例
 
