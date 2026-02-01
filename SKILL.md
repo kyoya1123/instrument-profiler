@@ -181,75 +181,21 @@ TaskOutput(task_id: "<shell_id>", block: false)
 
 汎用CPUプロファイリング。SwiftUIテンプレートと同様のフローを使用。
 
-```bash
-# バックグラウンドで実行
-Bash(run_in_background: true):
-  xctrace record --template "Time Profiler" --device "<デバイス>" --output $TRACE_FILE --launch <bundleId>
-
-# ユーザーに停止タイミングを確認（SwiftUIと同様）
-```
-
 #### Leaks / Allocationsテンプレートの場合
 
 メモリ関連テンプレートはユーザー操作が必要で、SwiftUIテンプレートと同様のフローを使用。
-
-```bash
-# バックグラウンドで実行
-Bash(run_in_background: true):
-  xctrace record --template "Leaks" --device "<デバイス>" --output $TRACE_FILE --launch <bundleId>
-  # または --template "Allocations"
-
-# ユーザーに停止タイミングを確認
-AskUserQuestion:
-  question: "アプリを操作してメモリを使用してください。完了したら停止してください"
-  options: [
-    { label: "停止", description: "計測を終了して解析を開始" },
-    { label: "もう少し待つ", description: "計測を継続" }
-  ]
-
-# 「停止」が選択されたら
-pkill -INT -f "xctrace record"
-```
 
 **注意**: Leaks/Allocationsは十分なメモリ操作（画面遷移、データ読み込み等）を行ってから停止すること。
 
 #### Animation Hitchesテンプレートの場合
 
-フレームドロップ検出。スクロールやアニメーション操作が必要。
-
-```bash
-# バックグラウンドで実行
-Bash(run_in_background: true):
-  xctrace record --template "Animation Hitches" --device "<デバイス>" --output $TRACE_FILE --launch <bundleId>
-
-# ユーザーに停止タイミングを確認
-AskUserQuestion:
-  question: "スクロールやアニメーション操作を行ってください。完了したら停止してください"
-  options: [
-    { label: "停止", description: "計測を終了して解析を開始" },
-    { label: "もう少し待つ", description: "計測を継続" }
-  ]
-```
+フレームドロップ検出。スクロールやアニメーション操作が必要。SwiftUIテンプレートと同様のフローを使用。
 
 #### Energy Logテンプレートの場合
 
 **重要**: Energy Logは**実機のみ**で正確なデータが取得可能。シミュレータでは意味のあるデータが得られない。
 
 デバイス選択時にシミュレータが選択された場合は警告を表示し、実機を選択するよう促す。
-
-```bash
-# 実機でバックグラウンド実行
-Bash(run_in_background: true):
-  xctrace record --template "Energy Log" --device "<実機UDID>" --output $TRACE_FILE --launch <bundleId>
-
-# ユーザーに停止タイミングを確認
-AskUserQuestion:
-  question: "アプリを通常使用してください（ネットワーク操作、バックグラウンド処理など）。完了したら停止してください"
-  options: [
-    { label: "停止", description: "計測を終了して解析を開始" },
-    { label: "もう少し待つ", description: "計測を継続" }
-  ]
-```
 
 ---
 
@@ -369,152 +315,6 @@ git clone https://github.com/brendangregg/FlameGraph
 | Heavy work in body | 事前計算・キャッシュ |
 | Large images | ダウンサンプリング |
 
-## Output Format
-
-### SwiftUIテンプレート使用時
-
-```markdown
-## プロファイリング結果
-
-- **Total Samples:** 868
-- **Total Time:** 868.00 ms
-
-## Hot Frames - Total Time (Top 10)
-
-| Rank | Function | Count | Total (ms) | Binary |
-|------|----------|-------|------------|--------|
-| 1 | __CFRunLoopRun | 494 | 494.00 | CoreFoundation |
-| 2 | AudioRecorder.processAudioBuffer | 17 | 17.00 | MyApp |
-
-## App Code (MyApp)
-
-| Function | Count | Total (ms) |
-|----------|-------|------------|
-| AudioRecorder.processAudioBuffer | 17 | 17.00 |
-| ContentView.body.getter | 6 | 6.00 |
-
-## SwiftUI View Body Updates (Top 10)
-
-| View | Count | Avg (µs) | Total (µs) |
-|------|-------|----------|------------|
-| MainContentView | 1 | 419.3 | 419.3 |
-| ContentView | 1 | 263.0 | 263.0 |
-
-## Potential Hangs
-
-**Total:** 0
-**Status:** ✅ OK - No hangs detected
-
-## Animation Hitches
-
-**Total:** 0
-**Status:** ✅ OK - No hitches detected
-```
-
-### App Launchテンプレート使用時
-
-```markdown
-## App Launch - Life Cycle Phases
-
-**Total Launch Time:** 1234.56 ms (1.23 s)
-
-| Phase | Duration (ms) | % | Description |
-|-------|---------------|---|-------------|
-| Initializing - Process Creation | 50.00 | 4.0% | Creating the process... |
-| Initializing - System Interface | 200.00 | 16.2% | Initializing system interface... |
-| Launching - Static Runtime Init | 150.00 | 12.2% | Running static initializers... |
-| Launching - UIKit Init | 300.00 | 24.3% | Initializing UIKit... |
-| Launching - Initial Frame Rendering | 400.00 | 32.4% | Rendering initial frame... |
-| Running | 134.56 | 10.9% | App is running... |
-
-### Launch Performance Assessment
-
-**Status:** ⚠️ Acceptable - Consider optimizing launch time
-
-## App Launch - Library Loading
-
-**Total Libraries:** 245
-**Total Load Time:** 89.45 ms
-
-### Slowest Libraries (>1ms)
-
-| Library | Duration (ms) |
-|---------|---------------|
-| SwiftUI | 12.34 |
-| Foundation | 8.76 |
-| UIKit | 7.89 |
-```
-
-### Leaksテンプレート使用時
-
-```markdown
-## Memory Leaks
-
-**Status:** ❌ Leaks detected!
-**Total Leaks:** 15
-**Total Leaked Memory:** 2.45 KB (2508 bytes)
-
-### Leaks by Library
-
-| Library | Count | Bytes |
-|---------|-------|-------|
-| MyApp | 10 | 1920 |
-| Foundation | 3 | 384 |
-| CoreFoundation | 2 | 204 |
-
-### Leaks by Responsible Frame (Top 15)
-
-| Function | Count | Bytes |
-|----------|-------|-------|
-| MyViewController.loadData() | 5 | 1024 |
-| NetworkManager.fetch(_:) | 3 | 512 |
-
-### Largest Leaks (Top 10)
-
-| Address | Size (bytes) | Responsible Frame |
-|---------|--------------|-------------------|
-| 0x600000c12340 | 256 | MyViewController.loadData() |
-| 0x600000c12380 | 128 | NetworkManager.fetch(_:) |
-```
-
-### Allocationsテンプレート使用時
-
-```markdown
-## Memory Allocations - Statistics
-
-**Persistent Memory:** 45.67 MB
-**Total Allocated:** 123.45 MB
-
-### Top Categories by Persistent Memory
-
-| Category | Persistent | Count | Total |
-|----------|------------|-------|-------|
-| VM: ImageIO_PNG_Data | 12.34 MB | 45 | 24.56 MB |
-| malloc | 8.90 MB | 12345 | 56.78 MB |
-| CFString (immutable) | 5.67 MB | 8901 | 12.34 MB |
-```
-
-### Energy Logテンプレート使用時
-
-```markdown
-## Energy Usage
-
-**Status:** ⚠️ Moderate - Some optimization may help
-
-### Average Usage
-
-- **Energy Impact:** 7.5 (max: 18.2)
-- **CPU Usage:** 12.3% (max: 85.6%)
-- **GPU Usage:** 5.2% (max: 45.0%)
-
-### High Energy Impact Periods (5 samples)
-
-| Time | Energy Impact | CPU | GPU |
-|------|---------------|-----|-----|
-| 00:15.234 | 18.2 | 85.6% | 12.3% |
-| 00:16.567 | 15.7 | 72.1% | 8.9% |
-```
-
 ## Troubleshooting
 
 | エラー | 原因 | 対処 |
@@ -529,85 +329,10 @@ git clone https://github.com/brendangregg/FlameGraph
 | Energy Logデータなし | シミュレータ非対応 | 実機で計測（シミュレータでは取得不可） |
 | No energy data | Xcode 13以前の制限 | Xcode 13以降にアップデート |
 
-## 完全ワークフロー例
-
-### App Launchの場合（全自動）
-
-```bash
-# 1. デバイス一覧取得（並列実行）
-mcp__XcodeBuildMCP__list_sims
-mcp__XcodeBuildMCP__list_devices
-# → AskUserQuestionでデバイス選択
-
-# 2. 実機の場合: xctrace UDID取得（Xcode UDIDと異なる場合がある）
-xctrace list devices | grep "<デバイス名>"
-
-# 3. Releaseビルド
-mcp__XcodeBuildMCP__session-set-defaults({ scheme: "...", configuration: "Release", ... })
-# 実機: build_device → install_app_device → bundleIdを控える
-# シミュレータ: build_sim → get_app_bundle_id → bundleIdを控える
-
-# 4. 計測モード選択（AskUserQuestion）→ App Launchを選択
-
-# 5. トレースファイル名を生成
-TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-TRACE_FILE="/tmp/profile_${TIMESTAMP}.trace"
-EXPORT_DIR="/tmp/exported_${TIMESTAMP}"
-
-# 6. プロファイリング実行（同期・全自動）
-xctrace record --template "App Launch" --device "<デバイス>" --output $TRACE_FILE --launch <bundleId>
-
-# 7. エクスポート・解析
-<skill_dir>/scripts/export_trace.sh $TRACE_FILE $EXPORT_DIR
-<skill_dir>/scripts/parse_trace.py $EXPORT_DIR --app "<アプリ名>"
-```
-
-### SwiftUIの場合（ユーザー操作が必要）
-
-```bash
-# 1. デバイス一覧取得（並列実行）
-mcp__XcodeBuildMCP__list_sims
-mcp__XcodeBuildMCP__list_devices
-# → AskUserQuestionでデバイス選択
-
-# 2. 実機の場合: xctrace UDID取得（Xcode UDIDと異なる場合がある）
-xctrace list devices | grep "<デバイス名>"
-
-# 3. Releaseビルド
-mcp__XcodeBuildMCP__session-set-defaults({ scheme: "...", configuration: "Release", ... })
-# 実機: build_device → install_app_device → bundleIdを控える
-# シミュレータ: build_sim → get_app_bundle_id → bundleIdを控える
-
-# 4. 計測モード選択（AskUserQuestion）→ SwiftUIを選択
-
-# 5. 起動方法選択（AskUserQuestion）
-#    - 「起動中のアプリに接続」→ PIDを検索して --attach <PID>
-#    - 「アプリを起動して計測」→ --launch <bundleId>
-
-# 6. トレースファイル名を生成
-TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-TRACE_FILE="/tmp/profile_${TIMESTAMP}.trace"
-TRACE_SYM_FILE="/tmp/profile_${TIMESTAMP}_sym.trace"
-EXPORT_DIR="/tmp/exported_${TIMESTAMP}"
-
-# 7. バックグラウンドでプロファイリング
-Bash(run_in_background: true):
-  # --attach の場合
-  xctrace record --template "SwiftUI" --device "<デバイス>" --output $TRACE_FILE --attach <PID>
-  # --launch の場合
-  xctrace record --template "SwiftUI" --device "<デバイス>" --output $TRACE_FILE --launch <bundleId>
-
-# 8. ユーザーに停止タイミング確認（AskUserQuestion）
-pkill -INT -f "xctrace record"
-
-# 9. シンボル化・エクスポート・解析
-xctrace symbolicate --input $TRACE_FILE --output $TRACE_SYM_FILE --dsym <dSYMパス>
-<skill_dir>/scripts/export_trace.sh $TRACE_SYM_FILE $EXPORT_DIR
-<skill_dir>/scripts/parse_trace.py $EXPORT_DIR --app "<アプリ名>"
-```
-
 ## References
 
-- xctraceコマンドの詳細は `references/xctrace-commands.md` を参照
+- xctraceコマンドの詳細: `references/xctrace-commands.md`
+- 出力フォーマット例: `references/output-format.md`
+- 完全ワークフロー例: `references/workflow-examples.md`
 - [Creating Flame Graphs from Time Profiler Data](https://benromano.com/blog/instruments-flame-graphs)
 - [xctrace man page](https://keith.github.io/xcode-man-pages/xctrace.1.html)
